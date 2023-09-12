@@ -6,6 +6,7 @@ import random
 pygame.init()
 import sys
 from math import atan2, degrees, pi
+from time import sleep
 # Constants
 WIDTH, HEIGHT = 800, 600
 MENU_FONT = pygame.font.Font(None, 36)
@@ -51,6 +52,7 @@ def start_menu(End):
             font = pygame.font.Font('freesansbold.ttf', 70)
             text = font.render( f'GAME OVER ' , True, (255, 0, 0))
             screen.blit(text, (200, 0))
+            sleep(1)
             
         
         # Draw start button
@@ -109,7 +111,7 @@ def main():
     Player_image=pygame.transform.scale(Player_image, (722/2.5, 400/2.5))  # Adjust player size as needed
     Player_image=pygame.transform.rotate(Player_image,-0)
     PLAYER = pymunk.Body(mass=100, moment=100, body_type=pymunk.Body.DYNAMIC)
-    player_shape = pymunk.Circle(radius=30,body=PLAYER)  # Reduced radius value for better visualization
+    player_shape = pymunk.Circle(radius=10,body=PLAYER)  # Reduced radius value for better visualization
     player_shape.friction = 1  # Adjusted friction value
     player_shape.elasticity = 1  # Adjusted elasticity value
     player_shape.position = 200,200
@@ -157,7 +159,7 @@ def main():
                 self.player_pos=position
                 self.speed=4
                 self.body=pymunk.Body(mass=10, moment=0, body_type=pymunk.Body.DYNAMIC)
-                self.shape = pymunk.Circle(radius=30,body=self.body)  # Reduced radius value for better visualization    
+                self.shape = pymunk.Circle(radius=5,body=self.body)  # Reduced radius value for better visualization    
                 self.shape.friction = 1  # Adjusted friction value
                 self.shape.elasticity = 1  # Adjusted elasticity value
                 self.shape.position = random.randint(0,800),random.randint(0,800)
