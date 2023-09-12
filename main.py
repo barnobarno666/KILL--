@@ -7,7 +7,15 @@ pygame.init()
 import sys
 from math import atan2, degrees, pi
 from time import sleep
+import json
 # Constants
+
+DIFFICULITY={
+    "number_of_enemies" : 3,
+    "Score":[],
+    "Lives":40,
+    "enemy_speed":4}
+
 WIDTH, HEIGHT = 800, 600
 MENU_FONT = pygame.font.Font(None, 36)
 
@@ -17,7 +25,7 @@ BLACK = (0, 0, 0)
 
 # Create the main window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Pygame Start Menu")
+pygame.display.set_caption("Start")
 
 def draw_text(text, font, color, surface, x, y):
     text_obj = font.render(text, True, color)
@@ -27,7 +35,6 @@ def draw_text(text, font, color, surface, x, y):
 
 def start_menu(End):
     running = True
-
     while running:
         try:
             for event in pygame.event.get():
@@ -36,11 +43,15 @@ def start_menu(End):
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if start_button_rect.collidepoint(event.pos):
-                        # Start button clicked, you can start your game here
-                        running = False
+                        
+                        running = False 
                     elif exit_button_rect.collidepoint(event.pos):
                         pygame.quit()
                         sys.exit()
+                        
+                    if easy_button_rect.collidepoint(event.pos):
+                        pass
+                    
         except:pass
                         
                             
@@ -60,12 +71,20 @@ def start_menu(End):
         pygame.draw.rect(screen, BLACK, start_button_rect)
         draw_text("Start Game", MENU_FONT, WHITE, screen, 400, 225)
 
+        # Draw easy button
+        easy_button_rect = pygame.Rect(300, 200, 200, 50)
+        pygame.draw.rect(screen, BLACK, start_button_rect)
+        draw_text("Start Game", MENU_FONT, WHITE, screen, 400, 225)
+
+
         # Draw exit button
         exit_button_rect = pygame.Rect(300, 300, 200, 50)
         pygame.draw.rect(screen, BLACK, exit_button_rect)
         draw_text("Exit", MENU_FONT, WHITE, screen, 400, 325)
 
         pygame.display.update()
+        
+
 
 # Run the start menu
 #
@@ -99,7 +118,7 @@ def main():
 
     # Set up the display
     screen = pygame.display.set_mode((800, 800))
-    pygame.display.set_caption("Rotating and Moving Player")
+    pygame.display.set_caption(" kill the enemy")
 
     # Initialize variables
     Player_rotation = 0.0  # Initial angle of rotation (in radians)
@@ -135,9 +154,9 @@ def main():
         def __init__(self,position,rotation,space) -> None:
             self.speed=4
             self.body=pymunk.Body(mass=1, moment=1, body_type=pymunk.Body.DYNAMIC)
-            self.shape = pymunk.Circle(radius=10,body=self.body)  # Reduced radius value for better visualization    
-            self.shape.friction = 1  # Adjusted friction value
-            self.shape.elasticity = 1  # Adjusted elasticity value
+            self.shape = pymunk.Circle(radius=10,body=self.body)      
+            self.shape.friction = 1  
+            self.shape.elasticity = 1  
             self.shape.position = position
             self.shape.body = self.body
             self.body.velocity=self.speed*math.cos(rotation),self.speed*math.sin(rotation)
@@ -155,9 +174,9 @@ def main():
 
 
     class Enemy:
-            def __init__(self,position,rotation,space) -> None:
+            def __init__(self,position,rotation,space,enemy_speed=speed) -> None:
                 self.player_pos=position
-                self.speed=4
+                self.speed=enemy_speed
                 self.body=pymunk.Body(mass=10, moment=0, body_type=pymunk.Body.DYNAMIC)
                 self.shape = pymunk.Circle(radius=5,body=self.body)  # Reduced radius value for better visualization    
                 self.shape.friction = 1  # Adjusted friction value
@@ -213,12 +232,18 @@ def main():
     Bullet_objects=[]
 
     Enemies_objects=[]
+##LOADING PARAMETERS
 
-    number_of_enemies=3
 
+    number_of_enemies=DIFFICULITY["number_of_enemies"]
     Score=0
-    Lives=40
+    Lives=DIFFICULITY["Lives"]
+    enemy_speed=DIFFICULITY["enemy_speed"]
+    
 
+
+
+###
     while running:
         End=False
 
@@ -306,7 +331,7 @@ def main():
             screen.blit(rotated_image, rotated_rect.topleft)
         
         while len(Enemies_objects)<number_of_enemies:
-            Enemies_objects.append(Enemy(player_shape.position,Player_rotation,space))
+            Enemies_objects.append(Enemy(player_shape.position,Player_rotation,space,enemy_speed=enemy_speed))
         
         
         for enemy in Enemies_objects:

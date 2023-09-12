@@ -1,0 +1,32 @@
+{   
+
+"easy_level" :{
+    "number_of_enemies" : 3,
+    "Score":[],
+    "Lives":40,
+    "enemy_speed":4
+},
+"medium_level":{
+    "number_of_enemies" : 5,
+    "Score":[],
+    "Lives":30,
+    "enemy_speed":6
+},
+"hard_level":{
+    "number_of_enemies" : 7,
+    "Score":[],
+    "Lives":20,
+    "enemy_speed":8
+},
+
+"extreme_level":{
+
+    "number_of_enemies" : 15,
+    "Score":[],
+    "Lives":7,
+    "enemy_speed":12
+}
+
+
+
+}
