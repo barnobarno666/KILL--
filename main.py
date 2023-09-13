@@ -4,11 +4,14 @@ import pymunk
 from pygame import mixer
 import random
 pygame.init()
+pygame.mixer.init()
 import sys
 from math import atan2, degrees, pi
 from time import sleep
 import json
 # Constants
+startsound=mixer.Sound("spaceship-abandoned-ambience-53790.mp3")
+
 
 DIFFICULITY={
     "number_of_enemies" : 7,
@@ -16,7 +19,7 @@ DIFFICULITY={
     "Lives":10,
     "enemy_speed":4}
 
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 800, 800
 MENU_FONT = pygame.font.Font(None, 36)
 
 # Colors
@@ -34,6 +37,7 @@ def draw_text(text, font, color, surface, x, y):
     surface.blit(text_obj, text_rect)
 
 def start_menu(End):
+    startsound.play(loops=-1)
     running = True
     while running:
         try:
@@ -43,7 +47,7 @@ def start_menu(End):
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if start_button_rect.collidepoint(event.pos):
-                        
+                        startsound.stop()
                         running = False 
                     elif exit_button_rect.collidepoint(event.pos):
                         pygame.quit()
@@ -58,7 +62,10 @@ def start_menu(End):
 
 
         # Clear the screen
-        screen.fill(WHITE)
+        screen.fill(BLACK)
+        
+        background=pygame.image.load("startbackground.png")
+        screen.blit(background,(00,0))
         if End:
             font = pygame.font.Font('freesansbold.ttf', 70)
             text = font.render( f'GAME OVER ' , True, (255, 0, 0))
@@ -89,6 +96,7 @@ def start_menu(End):
 # Run the start menu
 #
 
+screen_info = pygame.display.Info()
 
 def main():
     space=pymunk.Space()
@@ -98,12 +106,19 @@ def main():
         space.remove(bodies)
     
     
+    
     space.gravity=(100,00)
     static_lines = [
-            pymunk.Segment(space.static_body, (00, 780.0), (780, 780), 0.0),
-            pymunk.Segment(space.static_body, (780, 780), (780, 0), 0.0),
-            pymunk.Segment(space.static_body, (780, 0), (0, 0), 0.0),
-            pymunk.Segment(space.static_body, (0, 0), (0, 780), 0.0)
+            pymunk.Segment(space.static_body, (-200, 850), (1000, 850), 0.0),
+            pymunk.Segment(space.static_body, (1000, 850), (1000, 0), 0.0),
+            pymunk.Segment(space.static_body, (1000, 0), (0, 0), 0.0),
+            pymunk.Segment(space.static_body, (0, 0), (0, 850), 0.0)
+        ]
+    static_lines = [
+            pymunk.Segment(space.static_body, (-0, 800), (800, 800), 0.0),
+            pymunk.Segment(space.static_body, (800, 800), (800, 0), 0.0),
+            pymunk.Segment(space.static_body, (800, 0), (0, 0), 0.0),
+            pymunk.Segment(space.static_body, (0, 0), (0, 800), 0.0)
         ]
     for l in static_lines:
             l.friction = 0.5
@@ -117,17 +132,20 @@ def main():
 
 
     # Set up the display
-    screen = pygame.display.set_mode((800, 800))
+    #screen = pygame.display.set_mode((1420, 800))
+    screen = pygame.display.set_mode((800, 800)) #pygame.FULLSCREEN)
+    #print(screen_info.current_w, screen_info.current_h)
     pygame.display.set_caption(" kill the enemy")
+    #set screeen background image
 
     # Initialize variables
     Player_rotation = 0.0  # Initial angle of rotation (in radians)
     speed = 0  # Speed of movement
 
     # Load player image
-    Player_image = pygame.image.load("myplayer.png") # Replace "player.png" with your image path
+    Player_image = pygame.image.load("player.png") # Replace "player.png" with your image path
 
-    Player_image=pygame.transform.scale(Player_image, (722/2.5, 400/2.5))  # Adjust player size as needed
+    #Player_image=pygame.transform.scale(Player_image, (722/2.5, 400/2.5))  # Adjust player size as needed
     Player_image=pygame.transform.rotate(Player_image,-0)
     PLAYER = pymunk.Body(mass=100, moment=100, body_type=pymunk.Body.DYNAMIC)
     player_shape = pymunk.Circle(radius=10,body=PLAYER)  # Reduced radius value for better visualization
@@ -138,7 +156,9 @@ def main():
     space.add(PLAYER, player_shape)
 
 
-    BulletImage=pygame.image.load("bullet.png")
+    BulletImage=pygame.image.load("bulllet.png")
+    BulletImage=pygame.transform.scale(BulletImage , (70, 70))
+    
     EnemyImage=pygame.image.load("MY ENEMY.png")
 
     EnemyImage=pygame.transform.scale(EnemyImage , (722/4, 400/4)) 
@@ -181,7 +201,7 @@ def main():
                 self.shape = pymunk.Circle(radius=5,body=self.body)  # Reduced radius value for better visualization    
                 self.shape.friction = 1  # Adjusted friction value
                 self.shape.elasticity = 1  # Adjusted elasticity value
-                self.shape.position = random.randint(0,800),random.randint(0,800)
+                self.shape.position = random.randint(0,1000),random.randint(0,1000)
                 self.shape.body = self.body
                 #self.angle=rotation
                 space.add(self.body,self.shape)
@@ -241,15 +261,29 @@ def main():
     enemy_speed=DIFFICULITY["enemy_speed"]
     
 
+    #Set all the sounds
 
-
+    background_music=mixer.Sound("background music.mp3")
+    enemy_hit=mixer.Sound('male_hurt7-48124.mp3')
+    player_hurt=mixer.Sound('enemy hit.mp3')
+    player_dead=mixer.Sound('male-scream-in-fear-123079.mp3')
+    gunshot=mixer.Sound('blaster.mp3')
+    background_music.set_volume(.5)
+    enemy_hit.set_volume(.7)
+    player_hurt.set_volume(1)
+    player_dead.set_volume(1)
 ###
     while running:
         End=False
 
+
+
         
-        
+        background_music.play(loops=-1)
+
         screen.fill((0, 0, 0))
+        background = pygame.image.load("background.png")    
+        screen.blit(background, (0, 0))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -264,9 +298,10 @@ def main():
                 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 Bullet_objects.append(Bullet(position=player_shape.position,rotation=Player_rotation,space=space))
-                mixer.music.load("9mm-pistol-shoot-short-reverb-7152.mp3")
-                mixer.music.play(loops=0)            
-        
+                #mixer.music.load("9mm-pistol-shoot-short-reverb-7152.mp3")
+                mixer.music.load("blaster.mp3")
+                mixer.music.play(loops=0,fade_ms=100)            
+                #gunshot.play()
         
         
 
@@ -304,9 +339,9 @@ def main():
          
          
             
-        if player_shape.position[0]+velocityX>780 or player_shape.position[0]+velocityX<0:
+        if player_shape.position[0]+velocityX>1000 or player_shape.position[0]+velocityX<0:
             velocityX=0
-        if player_shape.position[1]+velocityY>780 or player_shape.position[1]+velocityY<0:
+        if player_shape.position[1]+velocityY>850 or player_shape.position[1]+velocityY<0:
             velocityY=0
         
         #if player_shape.position[0] < 500 or player_shape.position[0]==player_shape.position[1] :
@@ -339,6 +374,8 @@ def main():
             enemy.shape.position=enemy.shape.position[0]-enemy.body.velocity[0],enemy.shape.position[1]+enemy.body.velocity[1]
             for bullet in Bullet_objects:
                 if collisionfinder(bullet.shape.position,enemy.shape.position):
+
+                    
                     space.remove(bullet.body,bullet.shape)
                     Bullet_objects.remove(bullet)
                     Enemies_objects.remove(enemy)
@@ -357,13 +394,22 @@ def main():
                     if Lives==0:
                         mixer.music.load("male-scream-in-fear-123079.mp3")
                         mixer.music.play(loops=0)
-                        
+                        background_music.stop()
                         return True
                         running=False
                     break
                 except:pass
             
             enemy.draw_enemy(screen)
+        #enemy sound
+        if len(Enemies_objects) < number_of_enemies:
+                mixer.music.load('enemy.mp3')
+                mixer.music.play(loops=2)
+        
+        
+        
+        
+        
             
         #SCORE TEXt    
             
