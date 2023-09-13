@@ -11,9 +11,9 @@ import json
 # Constants
 
 DIFFICULITY={
-    "number_of_enemies" : 3,
+    "number_of_enemies" : 7,
     "Score":[],
-    "Lives":40,
+    "Lives":10,
     "enemy_speed":4}
 
 WIDTH, HEIGHT = 800, 600
