@@ -133,7 +133,7 @@ def main():
 
     # Set up the display
     #screen = pygame.display.set_mode((1420, 800))
-    screen = pygame.display.set_mode((800, 800)) #pygame.FULLSCREEN)
+    screen = pygame.display.set_mode((800, 800) ,pygame.FULLSCREEN)
     #print(screen_info.current_w, screen_info.current_h)
     pygame.display.set_caption(" kill the enemy")
     #set screeen background image
@@ -215,54 +215,37 @@ def main():
                 self.degs = degrees(rads)
 
             def find_velocity(self,player_shape):
-                
                 self.player_pos = player_shape.position
                 self.find_angle()
-                
+
                 #self.angle=math.atan2(player_shape.position[1]-self.shape.position[1],player_shape.position[0]-self.shape.position[0])
                 self.body.velocity=self.speed*math.cos(self.degs),self.speed*math.sin(self.degs)
-                
-                
-            
             def draw_enemy(self,screen):
                 rotated_image = pygame.transform.rotate(EnemyImage, math.degrees(self.degs/100) + 0*90+0*180)
                 rotated_rect = rotated_image.get_rect(center=self.shape.position)
                 screen.blit(rotated_image, rotated_rect.topleft)
-                
-        
-    
+                    
         #Bullet_objects.append([Bullet,Bullet_shape])
         #Bullets.append([Bullet_shape.position,Bullet.velocity,rotation])
         #screen.blit(rotated_image, rotated_rect.topleft)
-
-    
         #Bullet.velocity=speed*math.cos(rotation),speed*math.sin(rotation)
         #rotated_image = pygame.transform.rotate(BulletImage, math.degrees(rotation) + 90)
         #rotated_rect = rotated_image.get_rect(center=player_shape.position)
-        
-
     # Main game loop
     running = True
     clock = pygame.time.Clock()
     keys_pressed = {}
-
-
     #OBJECT HOLDERS and parameters 
     Bullets=[]
     Bullet_objects=[]
-
     Enemies_objects=[]
 ##LOADING PARAMETERS
-
-
     number_of_enemies=DIFFICULITY["number_of_enemies"]
     Score=0
     Lives=DIFFICULITY["Lives"]
     enemy_speed=DIFFICULITY["enemy_speed"]
-    
 
     #Set all the sounds
-
     background_music=mixer.Sound("background music.mp3")
     enemy_hit=mixer.Sound('male_hurt7-48124.mp3')
     player_hurt=mixer.Sound('enemy hit.mp3')
@@ -275,36 +258,23 @@ def main():
 ###
     while running:
         End=False
-
-
-
-        
         background_music.play(loops=-1)
-
         screen.fill((0, 0, 0))
         background = pygame.image.load("background.png")    
         screen.blit(background, (0, 0))
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
                 keys_pressed[event.key] = True
-
-            
             if event.type == pygame.KEYUP:
                 keys_pressed[event.key] = False
-        
-                
             if event.type == pygame.MOUSEBUTTONDOWN:
                 Bullet_objects.append(Bullet(position=player_shape.position,rotation=Player_rotation,space=space))
                 #mixer.music.load("9mm-pistol-shoot-short-reverb-7152.mp3")
                 mixer.music.load("blaster.mp3")
                 mixer.music.play(loops=0,fade_ms=100)            
                 #gunshot.play()
-        
-        
-
         speed=   -(keys_pressed.get(pygame.K_s, False) - keys_pressed.get(pygame.K_w, False))*10
         keys = pygame.key.get_pressed()
         
@@ -319,11 +289,7 @@ def main():
         velocityY = speed * math.sin(Player_rotation)
 
         # Update the position of the player
-        
-        
-        
-        
-            
+               
         for line in static_lines:
                 body = line.body
 
@@ -332,13 +298,7 @@ def main():
                 p1 = round(pv1.x), round((pv1.y))
                 p2 = round(pv2.x), round((pv2.y))
                 pygame.draw.lines(screen, pygame.Color("lightgray"), False, [p1, p2], 2)
-
-        
-         
-        
-         
-         
-            
+    
         if player_shape.position[0]+velocityX>1000 or player_shape.position[0]+velocityX<0:
             velocityX=0
         if player_shape.position[1]+velocityY>850 or player_shape.position[1]+velocityY<0:
@@ -354,6 +314,12 @@ def main():
         # Draw the player
         for bullet in Bullet_objects:
             #print((bullet.shape.position),(bullet.body.velocity[0]))
+            if bullet.shape.position[0]>1000 or bullet.shape.position[0]<0 or bullet.shape.position[1]>850 or bullet.shape.position[1]<0:
+                space.remove(bullet.body,bullet.shape)
+                Bullet_objects.remove(bullet)
+                break
+            
+            
             bullet.shape.position=bullet.shape.position[0]-bullet.body.velocity[0],bullet.shape.position[1]+bullet.body.velocity[1]
             #print(bullet.shape.position)#,player_shape.position)
             #bullet.draw_bullet(screen)
@@ -415,27 +381,17 @@ def main():
             
         font = pygame.font.Font('freesansbold.ttf', 32)
         text = font.render( f'Lives = {Lives}  , Score={Score}' , True, (255, 255, 255))
-        screen.blit(text, (00, 0))
-        
+        screen.blit(text, (00, 0)) 
         #DRAW BOX AROUND SCORE
         pygame.draw.lines(screen, pygame.Color("lightgray"), False, [(0,0),(400,0),(400,50),(0,50)], 2)
-        
-        
-        
-        
-        
-        
+        # Draw the player
         rotated_image = pygame.transform.rotate(Player_image, math.degrees(Player_rotation) + 90)
         rotated_rect = rotated_image.get_rect(center=player_shape.position)
         screen.blit(rotated_image, rotated_rect.topleft)
         pygame.display.flip()
-
         #print(player_shape.position[0],player_shape.position[0])
         #player_shape.position = player_shape.position[0], player_shape.w
         clock.tick(60)
-
-
-
 start_menu(End=False)
 while True: 
     start_menu(End=main())
